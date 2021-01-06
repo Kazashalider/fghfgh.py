@@ -1,16 +1,16 @@
 import matplotlib.pyplot as plt
 import numpy as np
-
+import scipy.special._lambertw
 #Wzięte z mojego Lab4, lekko zmienione by pasowało do moich potrzeb.
 def najm (l):
     """
-    Funkcja zwracająca największą wartość z wszystkich argumentów pozycyjnych. Najpierw sprawdza raz, czy pierwszy arguent jest liczbą, później
+    Funkcja zwracająca najmniejszą wartość z wszystkich argumentów pozycyjnych. Najpierw sprawdza raz, czy pierwszy arguent jest liczbą, później
     :return x:
     """
     y=0
     x=0
     for a in range(len(l)):
-        if y>=0:
+        if y<=0:
             y=y+1
             if isinstance(l[0], (int, float)):
                 x = float(l[0])
@@ -30,6 +30,8 @@ b=0.0001
 
 #Słownik przyspieszeń grawitacyjnych wybranych ciał niebieskich
 g={"Me":3.7,"W":8.87,"Z":9.807,"Ma":3.7,"K":1.622}
+gn={3.7:'Merkury lub Mars', 8.87:'Wenus',9.807:'Ziemia',1.622:'Księżyc'}
+c={3.7:'m', 8.87:'y',9.807:'b',1.622:'lightsteelblue'}
 
 #Pobieranie danych od użytkownika, wybór prędkości początkowej, kąt rzutu, uwzględnienie oporu ośrodka
 #wraz z wyborem jego wartości
@@ -95,10 +97,25 @@ Księżyc: K \nMars: Ma \nWybory oddzielaj spacjami ")
 #Znajdywanie najmniejszego przyspieszenia z tych które wybrał użytkownik. Potrzebne do określenia
 #wielkości wykresu (chcemy, największy wykres się zmieścił)
 G=najm(W)
-t=np.linspace(0,(np.log(((Vy*b+G)/G)**2)/b), 1000)
-
+if b<0.1:
+    t=np.linspace(0,np.log((((Vy*b)+G)/G)**2)/b,1000)
+else:
+    tl=np.real(scipy.special.lambertw((-(np.exp((-b*Vy)/(G-1)))*(G+b*Vy))/G))
+    t=np.linspace(0,((G*tl)+(b*Vy)+G)/(b*G),1000)
 x=(Vx/b)*(1-np.exp(-b*t))
-print(x.shape)
-y=((Vy/b)+(9.807/(b**2)))*(1-(np.exp((-b)*t)))-((9.807*t)/b)
-plt.plot(x,y,color='g',lw = 1, ls='-.',label='sin(x)')
+y=np.zeros((1000,len(W)))
+k=[]
+co=[]
+for element in W:
+    k.append(gn.get(element))
+    co.append(c.get(element))
+print(k)
+for i in range(len(W)):
+    y[:,i]=(((Vy/b)+(W[i]/b**2))*(1-np.exp(-b*t))-((W[i]*t)/b))
+    plt.plot(x, y[:,i], color=co[i], lw=1, ls='-.', label=k[i])
+plt.title('Tory ruchuów rzutów ukośnych')
+plt.legend(loc='lower center')
+plt.ylim(0,((Vy/b)+(G*np.log(G/((Vy*b)+G)))/(b**2)))
+plt.xlabel('odległość[m]')
+plt.ylabel('wysokość[m]')
 plt.show()

@@ -92,6 +92,7 @@ Księżyc: K \nMars: Ma \nWybory oddzielaj spacjami ")
             print("Nie powtarzaj wpisywancyh skrótów")
             break
     if len(W)==len(P):
+        W=list(set(W))
         break
 
 #Znajdywanie najmniejszego przyspieszenia z tych które wybrał użytkownik. Potrzebne do określenia
@@ -109,7 +110,6 @@ co=[]
 for element in W:
     k.append(gn.get(element))
     co.append(c.get(element))
-print(k)
 for i in range(len(W)):
     y[:,i]=(((Vy/b)+(W[i]/b**2))*(1-np.exp(-b*t))-((W[i]*t)/b))
     plt.plot(x, y[:,i], color=co[i], lw=1, ls='-.', label=k[i])
